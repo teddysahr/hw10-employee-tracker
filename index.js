@@ -1,14 +1,15 @@
-// console.log("HI");
-
 // DEPENDENCIES
 const inquirer = require("inquirer");
+const { getDepartments, createNewDepartment } = require("./server");
+const { getRoles } = require("./server");
+const { getEmployees } = require("./server");
 
 // QUESTIONS
 
 const mainMenuPrompt = [
   {
     type: "list",
-    message: "Welcome to EMPLOYEE MANAGER! What would you like to do?",
+    message: "What would you like to do?",
     name: "menu",
     choices: [
       "view all departments",
@@ -18,6 +19,7 @@ const mainMenuPrompt = [
       "add a role",
       "add an employee",
       "update an employee role",
+      "that's all for now!",
     ],
   },
 ];
@@ -92,21 +94,26 @@ const updateEmployeeRolePrompt = [
 
 // APP RUN
 
-const mainMenu = () => {
+function mainMenu() {
   inquirer.prompt(mainMenuPrompt).then((menuAnswer) => {
     if (menuAnswer.menu === "view all departments") {
-      console.log(`You chose ${menuAnswer.menu}`);
+      console.log("\n\n\n======================\n");
+      console.log(`DEPARTMENTS`);
+      console.log("\n======================\n\n\n");
       viewAllDepartments();
-      //getEngineerInfo();
     }
 
     if (menuAnswer.menu === "view all roles") {
-      console.log(`You chose ${menuAnswer.menu}`);
+      console.log("\n\n\n======================\n");
+      console.log(`ROLES`);
+      console.log("\n======================\n\n\n");
       viewAllRoles();
     }
 
     if (menuAnswer.menu === "view all employees") {
-      console.log(`You chose ${menuAnswer.menu}`);
+      console.log("\n\n\n======================\n");
+      console.log(`EMPLOYEES`);
+      console.log("\n======================\n\n\n");
       viewAllEmployees();
     }
 
@@ -129,30 +136,46 @@ const mainMenu = () => {
       console.log(`You chose ${menuAnswer.menu}`);
       updateEmployeeRole();
     }
+
+    if (menuAnswer.menu === "that's all for now!") {
+      exit();
+    }
   });
-};
+}
 
 const viewAllDepartments = () => {
-  console.log("cool");
-  mainMenu();
-};
-
-const viewAllRoles = () => {
-  console.log("cool");
-  mainMenu();
-};
-
-const viewAllEmployees = () => {
-  console.log("cool");
-  mainMenu();
-};
-
-const addDepartment = () => {
-  inquirer.prompt(addDepartmentPrompt).then((addDepartmentAnswer) => {
-    console.log(addDepartmentAnswer);
+  getDepartments().then(function (departments) {
+    console.table(departments[0]);
+    console.log("\n.\n.\n.\n");
     mainMenu();
   });
 };
+
+const viewAllRoles = () => {
+  getRoles().then(function (roles) {
+    console.table(roles[0]);
+    console.log("\n.\n.\n.\n");
+    mainMenu();
+  });
+};
+
+const viewAllEmployees = () => {
+  getEmployees().then(function (employees) {
+    console.table(employees[0]);
+    console.log("\n.\n.\n.\n");
+    mainMenu();
+  });
+};
+
+const addDepartment = () => {
+  createNewDepartment();
+};
+
+(async () => {
+  const response = await createNewDepartment();
+  console.log("it worked", response);
+  mainMenu();
+})();
 
 const addRole = () => {
   inquirer.prompt(addRolePrompt).then((addRoleAnswer) => {
@@ -175,4 +198,13 @@ const updateEmployeeRole = () => {
   });
 };
 
-mainMenu();
+const exit = () => {
+  return;
+};
+
+const init = () => {
+  console.log("WELCOME TO EMPLOYEE MANAGER");
+  mainMenu();
+};
+
+init();

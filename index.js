@@ -3,6 +3,7 @@ const inquirer = require("inquirer");
 const { getDepartments, createNewDepartment } = require("./server");
 const { getRoles } = require("./server");
 const { getEmployees } = require("./server");
+const { createNewRole } = require("./server");
 
 // QUESTIONS
 
@@ -82,7 +83,7 @@ const updateEmployeeRolePrompt = [
   {
     type: "input",
     message: "Which employee's role would you like to update?",
-    name: "update_employee_",
+    name: "update_employee",
   },
 
   {
@@ -168,19 +169,49 @@ const viewAllEmployees = () => {
 };
 
 const addDepartment = () => {
-  createNewDepartment();
+  inquirer.prompt(addDepartmentPrompt).then((addDepartmentAnswer) => {
+    createNewDepartment(addDepartmentAnswer.add_department).then(() => {
+      mainMenu();
+    });
+  });
 };
 
-(async () => {
-  const response = await createNewDepartment();
-  console.log("it worked", response);
-  mainMenu();
-})();
-
 const addRole = () => {
-  inquirer.prompt(addRolePrompt).then((addRoleAnswer) => {
-    console.log(addRoleAnswer);
-    mainMenu();
+  getDepartments().then(function (departments) {
+    const myArray = departments[0];
+    var dep = myArray.map(function (item) {
+      return item.Department_Name;
+    });
+
+    const addRolePrompt = [
+      {
+        type: "input",
+        message: "What is the name of the role?",
+        name: "add_role_name",
+      },
+
+      {
+        type: "input",
+        message: "What is this role's salary?",
+        name: "add_role_salary",
+      },
+
+      {
+        type: "list",
+        message: "What department is this role in?",
+        name: "add_role_department",
+        choices: dep,
+      },
+    ];
+    inquirer.prompt(addRolePrompt).then((addRoleAnswer) => {
+      createNewRole(
+        addRoleAnswer.add_role_name,
+        addRoleAnswer.add_role_salary,
+        addRoleAnswer.add_role_department
+      ).then(() => {
+        mainMenu();
+      });
+    });
   });
 };
 

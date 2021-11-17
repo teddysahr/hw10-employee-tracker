@@ -3,14 +3,6 @@ const mysql = require("mysql2");
 const cTable = require("console.table");
 const inquirer = require("inquirer");
 
-const addDepartmentPrompt = [
-  {
-    type: "input",
-    message: "What is the name of the department?",
-    name: "add_department",
-  },
-];
-
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -38,12 +30,18 @@ function getEmployees() {
     );
 }
 
-function createNewDepartment() {
-  inquirer.prompt(addDepartmentPrompt).then((addDepartmentAnswer) => {
-    db.promise().query(
-      `INSERT INTO departments (Department_Name) VALUES ("${addDepartmentAnswer.add_department}")`
+function createNewDepartment(cat) {
+  return db
+    .promise()
+    .query(`INSERT INTO departments (Department_Name) VALUES ("${cat}")`);
+}
+
+function createNewRole(title, salary, id) {
+  return db
+    .promise()
+    .query(
+      `INSERT INTO roles (title, salary, department_id) VALUES ("${title}", ${salary}, 3)`
     );
-  });
 }
 
 module.exports = {
@@ -51,4 +49,5 @@ module.exports = {
   getRoles,
   getEmployees,
   createNewDepartment,
+  createNewRole,
 };
